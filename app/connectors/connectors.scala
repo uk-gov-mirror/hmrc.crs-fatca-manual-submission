@@ -34,13 +34,9 @@ import uk.gov.hmrc.http.{HeaderCarrier, HeaderNames}
 
 import java.time.format.DateTimeFormatter
 import java.time.{ZoneId, ZonedDateTime}
-import java.util.UUID
+import java.util.{Locale, UUID}
 
-package connector:
-
-  import java.util.Locale
-
-  val stripSession: String => String = (input: String) => input.replace("session-", "")
+package connectors:
 
   extension (seq: Seq[(String, String)])
     def withBearerToken(bearerToken: String): Seq[(String, String)] =
@@ -55,7 +51,7 @@ package connector:
     }
 
     def withXConversationId(value: Option[String] = None)(implicit headerCarrier: HeaderCarrier): Seq[(String, String)] = {
-      val xConversationId = stripSession(value.getOrElse(headerCarrier.sessionId.map(_.value).getOrElse(UUID.randomUUID().toString)))
+      val xConversationId = value.getOrElse(UUID.randomUUID().toString)
       seq :+ ("x-conversation-id" -> s"$xConversationId")
     }
 

@@ -25,8 +25,8 @@ class AppConfig @Inject() (config: Configuration, servicesConfig: ServicesConfig
 
   val appName: String = config.get[String]("appName")
   val cacheTtl: Long = config.get[Int]("mongodb.timeToLiveInDays")
-  val readSubmissionToken: String = config.get[String]("microservices.service.read-submission-history.auth")
-  val readSubmissionUrl : String = servicesConfig.baseUrl("read-submission-history")
+  val readSubmissionToken: String = config.get[String]("microservice.services.read-submission.auth")
+  val readSubmissionUrl : String = servicesConfig.baseUrl("read-submission")
 
   lazy val voidFatcaSubmission: String = servicesConfig.baseUrl("void-fatca-submission")
   val bearerToken: String => String = (serviceName: String) => config.get[String](s"microservice.services.$serviceName.bearer-token")

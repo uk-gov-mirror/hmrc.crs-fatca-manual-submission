@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package connector
+package connectors
 
 import config.AppConfig
 import models.VoidRequestPayload
@@ -24,16 +24,15 @@ import play.api.libs.json.Json
 import play.api.libs.ws.JsonBodyWritables.*
 import uk.gov.hmrc.http.client.HttpClientV2
 import uk.gov.hmrc.http.{HeaderCarrier, HttpResponse, StringContextOps, UpstreamErrorResponse}
-
 import javax.inject.Inject
 import scala.concurrent.{ExecutionContext, Future}
+import uk.gov.hmrc.http.HttpReads.Implicits.*
 
-class CADXConnector @Inject()(val config: AppConfig, val httpClient: HttpClientV2)(implicit ec: ExecutionContext) extends Logging {
+class FatcaVoidConnector @Inject()(val config: AppConfig, val httpClient: HttpClientV2)(implicit ec: ExecutionContext) extends Logging {
 
-    def submitFatcaVoid(requestBody: VoidRequestPayload)(implicit hc: HeaderCarrier): Future[Unit] = {
+    def submit(requestBody: VoidRequestPayload)(implicit hc: HeaderCarrier): Future[Unit] = {
     val serviceName = "void-fatca-submission"
     val endpoint    = url"${config.voidFatcaSubmission}/dac6/submitVoidRequest/v1"
-
     val headers =
       Seq()
         .withAccept()
@@ -48,16 +47,20 @@ class CADXConnector @Inject()(val config: AppConfig, val httpClient: HttpClientV
       .setHeader(headers: _*)
       .withBody(Json.toJson(requestBody))
       .execute[HttpResponse]
-      .map { response =>
+      .flatMap { response =>
         response.status match {
           case NO_CONTENT => Future.successful(())
           case status =>
+            val mayBeCorrelationId: Option[String] =
+              headers.collectFirst {
+                case (name, value) if name.equalsIgnoreCase("x-correlation-Id") => value
+              }
             logger.error(
               s"""
                  |EIS API call failed
                  |Status: $status
-                 |Response body:
-                 |${response.body}
+                 |CorrelationId: ${mayBeCorrelationId.getOrElse("not-present")}
+                 |Response body: ${response.body}
                  |""".stripMargin)
             Future.failed(UpstreamErrorResponse(
               message = s"Unexpected response from EIS API: $status",
@@ -66,5 +69,6 @@ class CADXConnector @Inject()(val config: AppConfig, val httpClient: HttpClientV
             ))
         }
       }
-  }
+
+    }
 }

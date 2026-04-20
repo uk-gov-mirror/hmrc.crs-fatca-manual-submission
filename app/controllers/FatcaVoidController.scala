@@ -20,28 +20,32 @@ import controllers.actions.IdentifierAction
 import models.VoidFatcaRequest
 import play.api.libs.json.JsValue
 import play.api.mvc.{Action, ControllerComponents}
-import service.CADXService
+import service.FatcaVoidService
 import uk.gov.hmrc.play.bootstrap.backend.controller.BackendController
 
 import javax.inject.{Inject, Singleton}
 import scala.concurrent.{ExecutionContext, Future}
 
 @Singleton()
-class CADXController @Inject()(
-  cc: ControllerComponents,
-  service: CADXService,
-  identifierAction: IdentifierAction
+class FatcaVoidController @Inject()(
+                                     cc: ControllerComponents,
+                                     service: FatcaVoidService,
+//                                     identifierAction: IdentifierAction
 )(implicit ec: ExecutionContext)
     extends BackendController(cc) {
 
-  def submitFatcaVoid(): Action[JsValue] = identifierAction.async(parse.json) { implicit request =>
+  def submit(): Action[JsValue] = Action.async(parse.json) { implicit request =>
+    val subscriptionID = "TestSubscriptionId"
     request.body
       .validate[VoidFatcaRequest]
       .fold(
         invalid = _ => Future.successful(InternalServerError),
         valid = voidFatcaRequest => {
-//          service.voidSubmission(voidFatcaRequest)
-          Future.successful(Ok)
+          service.submit(subscriptionID, voidFatcaRequest)
+            .map(_ => Ok)
+            .recover {
+              case _ => InternalServerError
+            }
         }
       )
   }
