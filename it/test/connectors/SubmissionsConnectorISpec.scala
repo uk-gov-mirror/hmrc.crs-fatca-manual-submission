@@ -94,6 +94,7 @@ class SubmissionsConnectorISpec extends SpecHelper with WireMockServerHandler {
 
   "SubmissionsConnector" - {
     "Should return submissionList when EIS returns a 200 response with a valid response body" in {
+      
       val requestPayload = readSubmissionRequestGen.sample.getOrElse(
         fail("Generator did not produce a value")
       )

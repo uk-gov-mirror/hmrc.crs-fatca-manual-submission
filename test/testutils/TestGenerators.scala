@@ -18,21 +18,10 @@ package testutils
 
 import models.SubmissionsConstants.{CRFA, CRS, CRS701, FATCA, PASSED, RegimeType, XML}
 import models.fatcavoid.*
-import models.{
-  CommonParameters,
-  ReadSubmissionRequest,
-  ReadSubmissionRequestCommon,
-  ReadSubmissionRequestDetails,
-  ReadSubmissionResponse,
-  ReadSubmissionResponseCommon,
-  ReadSubmissionResponseDetails,
-  SubmissionsListRequest,
-  SubmissionsListResponse,
-  SubmittedReport
-}
+import models.{CommonParameters, ReadSubmissionRequest, ReadSubmissionRequestCommon, ReadSubmissionRequestDetails, ReadSubmissionResponse, ReadSubmissionResponseCommon, ReadSubmissionResponseDetails, SubmissionsListRequest, SubmissionsListResponse, SubmittedReport}
 import org.scalacheck.Gen
 
-import java.time.LocalDateTime
+import java.time.{Instant, LocalDateTime}
 
 trait TestGenerators {
 
@@ -102,7 +91,7 @@ trait TestGenerators {
           fiName = fiName,
           fileName = fileName,
           submissionStatus = PASSED,
-          uploadDateTime = LocalDateTime.now(),
+          uploadDateTime =Instant.now(),
           regime = CRS,
           reportingYear = "2025",
           submissionCaseId = submissionCaseId,

@@ -94,7 +94,7 @@ trait Generators {
           fiName = fiName,
           fileName = fileName,
           submissionStatus = PASSED,
-          uploadDateTime = LocalDateTime.now(),
+          uploadDateTime = Instant.now(),
           regime = CRS,
           reportingYear = "2025",
           submissionCaseId = submissionCaseId,
